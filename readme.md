@@ -1,5 +1,20 @@
 # Quantum Mechanical Keyboard Firmware
 
+---
+
+## This is a personal fork with Evoworks EVO80 support + GCC 15 / Debian testing fixes
+
+If you're trying to build QMK for the **Evoworks EVO80** or hitting build errors on **Debian testing with GCC 15 and picolibc**, this fork has what you need.
+
+**Added on top of mainline:**
+- `keyboards/evoworks/evo80/` — EVO80 support, originally from [carlosedp's fork](https://github.com/carlosedp/qmk_firmware)
+- `lib/rdmctmzt_common/` — shared hardware lib for wireless modes, RGB and battery
+- GCC 15 fix: mismatched header guard in `lib/chibios-contrib/.../system_fs026.h`
+- GCC 15 fix: `struct _reent` forward declaration in `lib/chibios/os/various/syscalls.c` (removed from picolibc)
+- Debian testing fix: picolibc auto-detection for ARM in `platforms/chibios/platform.mk` — falls back to `picolibc.specs` when `nano.specs` is unavailable
+
+---
+
 [![Current Version](https://img.shields.io/github/tag/qmk/qmk_firmware.svg)](https://github.com/qmk/qmk_firmware/tags)
 [![Discord](https://img.shields.io/discord/440868230475677696.svg)](https://discord.gg/qmk)
 [![Docs Status](https://img.shields.io/badge/docs-ready-orange.svg)](https://docs.qmk.fm)
