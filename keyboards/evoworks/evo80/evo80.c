@@ -68,11 +68,9 @@ led_config_t g_led_config = { {
 // QMK Callback Functions - Delegate to common implementations
 // ===========================================================================
 
-bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
-    // Call common implementation for all standard indicators
+bool rgb_matrix_indicators_advanced_kb(uint8_t led_min, uint8_t led_max) {
     kb_rgb_matrix_indicators_common(led_min, led_max);
-
-    return false;
+    return rgb_matrix_indicators_advanced_user(led_min, led_max);
 }
 
 void notify_usb_device_state_change_user(struct usb_device_state usb_device_state) {
