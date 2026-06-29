@@ -140,11 +140,23 @@ void rgb_matrix_driver_flush_pwm_dma_start(void) {
     DMA_list[1].destination_data_end_address = (uint32_t)(&(GP16C2T1->CCVAL1));
 
 #ifdef WS2812_DISABLE_LEDS_FROM
-    // Force the LED just before the cutoff to valid L_VALUE bytes so the WS2812 can latch off.
-    // Without this the chip at that position sees a bare reset with no valid data and holds its old latch.
-    memset(g_es_pwm_rgb_matrix_array_dma_buf + ((WS2812_DISABLE_LEDS_FROM - 1) * ES_PWM_LED_BYTE), ES_PWM_WS2812_L_VALUE, ES_PWM_LED_BYTE);
-    memset(g_es_pwm_rgb_matrix_array_dma_buf + (WS2812_DISABLE_LEDS_FROM * ES_PWM_LED_BYTE), 0, 50);
-    uint16_t Data_Size = ((WS2812_DISABLE_LEDS_FROM - (ES_PWM_LED_SIZE * 2)) * ES_PWM_LED_BYTE) + 50;
+    // LEDs 88-90 (arrow keys) receive explicit GRB data every frame to prevent
+    // WS2812 bus contention from leaving stale latches on those positions.
+    { uint8_t *b = g_es_pwm_rgb_matrix_array_dma_buf + (88 * ES_PWM_LED_BYTE);
+      memset(b,      ES_PWM_WS2812_L_VALUE, 8);
+      memset(b + 8,  ES_PWM_WS2812_H_VALUE, 8);
+      memset(b + 16, ES_PWM_WS2812_L_VALUE, 8); }
+    { uint8_t *b = g_es_pwm_rgb_matrix_array_dma_buf + (89 * ES_PWM_LED_BYTE);
+      memset(b,      ES_PWM_WS2812_H_VALUE, 8);
+      memset(b + 8,  ES_PWM_WS2812_L_VALUE, 8);
+      memset(b + 16, ES_PWM_WS2812_L_VALUE, 8); }
+    { uint8_t *b = g_es_pwm_rgb_matrix_array_dma_buf + (90 * ES_PWM_LED_BYTE);
+      memset(b,      ES_PWM_WS2812_L_VALUE, 8);
+      memset(b + 8,  ES_PWM_WS2812_L_VALUE, 8);
+      memset(b + 16, ES_PWM_WS2812_H_VALUE, 8); }
+    g_es_pwm_rgb_matrix_array_dma_buf[91 * ES_PWM_LED_BYTE]     = 0;
+    g_es_pwm_rgb_matrix_array_dma_buf[91 * ES_PWM_LED_BYTE + 1] = 0;
+    uint16_t Data_Size = ((91 - (ES_PWM_LED_SIZE * 2)) * ES_PWM_LED_BYTE) + 2;
 #else
     uint16_t Data_Size = (((RGB_MATRIX_LED_COUNT - (ES_PWM_LED_SIZE * 2)) * ES_PWM_LED_BYTE) + 2);
 #endif
