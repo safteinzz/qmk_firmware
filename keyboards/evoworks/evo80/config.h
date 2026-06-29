@@ -76,3 +76,5 @@
 #define LOGO_LED_ENABLE 1
 #define LED_LOGO_INDEX 91 // First non-key LED in the chain (indices 91-95 are non-key LEDs)
 #define LOGO_LED_COUNT 5  // Number of Logo LEDs (uses indices 91-95)
+
+#define WS2812_DISABLE_LEDS_FROM 89

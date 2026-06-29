@@ -48,6 +48,10 @@ const uint32_t g_es_dma_ch2pri_cfg = ((MD_DMA_CHANNEL_CFG_MODE_PERIPHERAL_PRIMAR
 
 const uint32_t g_es_dma_ch2alt_cfg = ((MD_DMA_CHANNEL_CFG_MODE_PERIPHERAL_ALTERNATE) | ((MD_DMA_CHANNEL_CFG_RPOWER_SIZE_1) << 14) | ((MD_DMA_CHANNEL_CFG_SRCDATA_SIZE_BYTE) << 24) | ((MD_DMA_CHANNEL_CFG_SRCINC_BYTE) << 26) | ((MD_DMA_CHANNEL_CFG_DSTDATA_SIZE_BYTE) << 28) | ((MD_DMA_CHANNEL_CFG_DSTINC_NO_INC) << 30));
 
+#if LOGO_LED_ENABLE
+bool Logo_Led_Force_Off = false;
+#endif
+
 bool     Led_Rf_Pair_Flg        = false;
 bool     Key_2p4g_Status        = false;
 bool     Key_Ble_1_Status       = false;

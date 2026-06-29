@@ -59,6 +59,7 @@ void rgb_matrix_driver_init(void) {
     GPIOA->MOD |= 0x00000020;
 
     md_dma_set_request_peripherals(DMA1, MD_DMA_CHANNEL2, MD_DMA_PRS_GP16C2T1_UP);
+    md_dma_set_channel_priority(DMA1, MD_DMA_CHANNEL2);
 
     if (rgb_matrix_get_val() <= 0) {
         memset((void *)g_es_pwm_rgb_matrix_array_dma_buf, ES_PWM_WS2812_L_VALUE, (RGB_MATRIX_LED_COUNT * ES_PWM_LED_BYTE) + 2);
@@ -138,7 +139,15 @@ void rgb_matrix_driver_flush_pwm_dma_start(void) {
     DMA_list[1].source_data_end_address      = (uint32_t)(g_es_pwm_rgb_matrix_array_dma_buf + ((ES_PWM_DMA_SIZE * 2) - 1));
     DMA_list[1].destination_data_end_address = (uint32_t)(&(GP16C2T1->CCVAL1));
 
-    uint16_t Data_Size                       = (((RGB_MATRIX_LED_COUNT - (ES_PWM_LED_SIZE * 2)) * ES_PWM_LED_BYTE) + 2);
+#ifdef WS2812_DISABLE_LEDS_FROM
+    // Force the LED just before the cutoff to valid L_VALUE bytes so the WS2812 can latch off.
+    // Without this the chip at that position sees a bare reset with no valid data and holds its old latch.
+    memset(g_es_pwm_rgb_matrix_array_dma_buf + ((WS2812_DISABLE_LEDS_FROM - 1) * ES_PWM_LED_BYTE), ES_PWM_WS2812_L_VALUE, ES_PWM_LED_BYTE);
+    memset(g_es_pwm_rgb_matrix_array_dma_buf + (WS2812_DISABLE_LEDS_FROM * ES_PWM_LED_BYTE), 0, 50);
+    uint16_t Data_Size = ((WS2812_DISABLE_LEDS_FROM - (ES_PWM_LED_SIZE * 2)) * ES_PWM_LED_BYTE) + 50;
+#else
+    uint16_t Data_Size = (((RGB_MATRIX_LED_COUNT - (ES_PWM_LED_SIZE * 2)) * ES_PWM_LED_BYTE) + 2);
+#endif
     DMA_list[2].control.word                 = ((Data_Size - 1) << 4) | g_es_dma_ch2alt_cfg;
     DMA_list[2].source_data_end_address      = (uint32_t)(g_es_pwm_rgb_matrix_array_dma_buf + ((ES_PWM_DMA_SIZE * 2) + Data_Size - 1));
     DMA_list[2].destination_data_end_address = (uint32_t)(&(GP16C2T1->CCVAL1));

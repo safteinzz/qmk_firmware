@@ -57,8 +57,8 @@ led_config_t g_led_config = { {
     1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
     1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
     1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
-    1,      1,  1,  1,  1,  1,  1,  1,  1,  1,  1,      1,      1,
-    1,  1,  1,          1,                  1,  1,  1,  1,  1,  1,  1,
+    1,      1,  1,  1,  1,  1,  1,  1,  1,  1,  1,      1,      0,
+    1,  1,  1,          1,                  1,  1,  1,  1,  0,  0,  0,
 
     0,  0,  0,  0,  0
 } };
@@ -69,6 +69,13 @@ led_config_t g_led_config = { {
 // ===========================================================================
 
 bool rgb_matrix_indicators_advanced_kb(uint8_t led_min, uint8_t led_max) {
+    static const uint8_t disabled_leds[] = {79, 88, 89, 90, 91, 92, 93, 94, 95};
+    for (uint8_t i = 0; i < sizeof(disabled_leds); i++) {
+        uint8_t idx = disabled_leds[i];
+        if (idx >= led_min && idx < led_max) {
+            rgb_matrix_driver_set_color(idx, 0, 0, 0);
+        }
+    }
     kb_rgb_matrix_indicators_common(led_min, led_max);
     return rgb_matrix_indicators_advanced_user(led_min, led_max);
 }
