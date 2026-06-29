@@ -76,8 +76,12 @@ bool rgb_matrix_indicators_advanced_kb(uint8_t led_min, uint8_t led_max) {
             rgb_matrix_driver_set_color(idx, 0, 0, 0);
         }
     }
+    // User heatmap runs first (colors all keys), then KB indicators override
+    // specific LEDs for status (caps lock, win lock, battery, connection).
+    // This order prevents indicator LEDs from being stuck with wrong colors.
+    rgb_matrix_indicators_advanced_user(led_min, led_max);
     kb_rgb_matrix_indicators_common(led_min, led_max);
-    return rgb_matrix_indicators_advanced_user(led_min, led_max);
+    return false;
 }
 
 void notify_usb_device_state_change_user(struct usb_device_state usb_device_state) {
