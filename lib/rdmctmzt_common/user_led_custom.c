@@ -140,12 +140,10 @@ void rgb_matrix_driver_flush_pwm_dma_start(void) {
     DMA_list[1].destination_data_end_address = (uint32_t)(&(GP16C2T1->CCVAL1));
 
 #ifdef WS2812_DISABLE_LEDS_FROM
-    // Force LEDs 88-90 (arrow keys) to black each frame to prevent WS2812 bus
-    // contention from leaving stale latches. All bits low = GRB(0,0,0) = off.
-    memset(g_es_pwm_rgb_matrix_array_dma_buf + (88 * ES_PWM_LED_BYTE), ES_PWM_WS2812_L_VALUE, 3 * ES_PWM_LED_BYTE);
-    g_es_pwm_rgb_matrix_array_dma_buf[91 * ES_PWM_LED_BYTE]     = 0;
-    g_es_pwm_rgb_matrix_array_dma_buf[91 * ES_PWM_LED_BYTE + 1] = 0;
-    uint16_t Data_Size = ((91 - (ES_PWM_LED_SIZE * 2)) * ES_PWM_LED_BYTE) + 2;
+    // Frame ends at LED 88 — LEDs 88-95 receive no signal and hold dark after power cycle.
+    g_es_pwm_rgb_matrix_array_dma_buf[87 * ES_PWM_LED_BYTE]     = 0;
+    g_es_pwm_rgb_matrix_array_dma_buf[87 * ES_PWM_LED_BYTE + 1] = 0;
+    uint16_t Data_Size = ((87 - (ES_PWM_LED_SIZE * 2)) * ES_PWM_LED_BYTE) + 2;
 #else
     uint16_t Data_Size = (((RGB_MATRIX_LED_COUNT - (ES_PWM_LED_SIZE * 2)) * ES_PWM_LED_BYTE) + 2);
 #endif
